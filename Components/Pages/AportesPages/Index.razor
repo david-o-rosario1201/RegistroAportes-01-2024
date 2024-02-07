@@ -1,6 +1,7 @@
 ﻿@page "/Aportes"
 @inject AportesService aportesService
 @inject NavigationManager navigation
+@rendermode InteractiveServer
 @attribute [StreamRendering]
 
 <PageTitle>Aportes</PageTitle>
@@ -64,11 +65,11 @@
 
 	public void IrACrear()
 	{
-		navigation.NavigateTo("/AportesCreate");
+		navigation.NavigateTo("/CreateAportes");
 	}
 
 	public void IrADetalles()
 	{
-		navigation.NavigateTo("/AportesDetails");
+		navigation.NavigateTo("/DetailsAportes");
 	}
 }
