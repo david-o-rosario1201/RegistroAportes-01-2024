@@ -50,7 +50,7 @@ public class AportesService
 			.AsNoTracking()
 			.FirstOrDefaultAsync(a => a.AporteId == aporte.AporteId);
 	}
-	public async Task<List<Aportes?>> Listar(Expression<Func<Aportes,bool>> criterio)
+	public async Task<List<Aportes>> Listar(Expression<Func<Aportes,bool>> criterio)
 	{
 		return await _contexto.Aportes
 			.AsNoTracking()
