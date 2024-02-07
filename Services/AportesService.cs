@@ -44,11 +44,11 @@ public class AportesService
 			.ExecuteDeleteAsync();
 		return eliminar > 0;
 	}
-	public async Task<Aportes?> Buscar(Aportes aporte)
+	public async Task<Aportes?> Buscar(int id)
 	{
 		return await _contexto.Aportes
 			.AsNoTracking()
-			.FirstOrDefaultAsync(a => a.AporteId == aporte.AporteId);
+			.FirstOrDefaultAsync(a => a.AporteId == id);
 	}
 	public async Task<List<Aportes>> Listar(Expression<Func<Aportes,bool>> criterio)
 	{
