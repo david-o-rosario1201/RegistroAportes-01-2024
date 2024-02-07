@@ -1,0 +1,74 @@
+﻿@page "/Aportes"
+@inject AportesService aportesService
+@inject NavigationManager navigation
+@attribute [StreamRendering]
+
+<PageTitle>Aportes</PageTitle>
+<div class="container">
+	<div class="card shadow-lg">
+		@*Header*@
+		<div class="card-header">
+			<h3><strong>Aportes</strong></h3>
+			<button type="button" class="btn btn-outline-primary" @onclick="IrACrear">Crear</button>
+			<button type="button" class="btn btn-outline-info" @onclick="IrADetalles">Detalles</button>
+		</div>
+		@*Body*@
+		<div class="card-body">
+			@if(aportes.Count == 0)
+			{
+				<p><em>Cargando...</em></p>
+			}
+			else
+			{
+				<table class="table">
+					<thead>
+						<tr>
+							<th>Aporte Id</th>
+							<th>Fecha</th>
+							<th>Persona</th>
+							<th>Observaci&oacute;n</th>
+							<th>Monto</th>
+						</tr>
+					</thead>
+					<tbody>
+						@foreach(var aporte in aportes)
+						{
+							<tr>
+								<td>@aporte.AporteId</td>
+								<td>@aporte.Fecha</td>
+								<td>@aporte.Persona</td>
+								<td>@aporte.Observacion</td>
+								<td>@aporte.Monto</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			}
+		</div>
+		@*Footer*@
+		<div class="card-footer">
+			<p><strong>Total de Aportes:</strong> @aportes.Count</p>
+		</div>
+	</div>
+</div>
+
+@code {
+	public List<Aportes> aportes = new List<Aportes>();
+
+	protected override async Task OnInitializedAsync()
+	{
+		await Task.Delay(500);
+		Expression<Func<Aportes, bool>> criterio = a => a.AporteId > 0;
+		aportes = await aportesService.Listar(criterio);
+	}
+
+	public void IrACrear()
+	{
+		navigation.NavigateTo("/AportesCreate");
+	}
+
+	public void IrADetalles()
+	{
+		navigation.NavigateTo("/AportesDetails");
+	}
+}
