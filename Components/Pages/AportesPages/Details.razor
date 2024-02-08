@@ -39,7 +39,7 @@
 						<label class="form-label" for="filtrar"><strong>Campo a Filtrar:</strong></label>
 						<div class="col-3">
 							<InputSelect id="filtrar" class="form-select" @bind-Value="filtrar" @oninput="(e) => ActualizarFiltro(e.Value.ToString())">
-								<option>Seleccione una opcion para filtrar</option>
+								<option>Seleccione una opcion</option>
 								<option value="aporte id">Aporte Id</option>
 								<option value="persona">Persona</option>
 							</InputSelect>
@@ -88,8 +88,14 @@
 		</div>
 		@*Footer*@
 		<div class="card-footer">
-			<p><strong>Total de Aportes:</strong> @aportes.Count</p>
-			<p><strong>Monto Total:</strong> @montoTotal</p>
+			<div class="row">
+				<div class="col-10">
+					<p><strong>Total de Aportes:</strong> @aportes.Count</p>
+				</div>
+				<div class="col">
+					<p><strong>Monto Total:</strong> @montoTotal</p>
+				</div>
+			</div>
 		</div>
 	</div>
 </div>
@@ -122,6 +128,13 @@
 			return;
 		}
 
+		if (valorFiltrar == null)
+		{
+			mensaje = "Debe ingresar un dato";
+			await Task.Delay(3000);
+			return;
+		}
+
 		List<Aportes> filtradoList1 = new List<Aportes>();
 
 		if (tipoValor == "aporte id")
@@ -132,11 +145,17 @@
 			filtradoList1 = await aportesService.Listar(criterio);
 			Filtrado(filtradoList1);
 		}
-		else
+		else if (tipoValor == "persona")
 		{
 			Expression<Func<Aportes, bool>> criterio = a => a.Persona == valorFiltrar;
 			filtradoList1 = await aportesService.Listar(criterio);
 			Filtrado(filtradoList1);
+		}
+		else
+		{
+			mensaje = "Debe elegir una opción para filtrar";
+			await Task.Delay(3000);
+			mensaje = string.Empty;
 		}
 	}
 
