@@ -1,0 +1,75 @@
+﻿@page "/DeleteAportes"
+@page "/DeleteAportes/aporteid={aporteid:int}"
+@inject AportesService aportesService
+@inject NavigationManager navigation
+@rendermode InteractiveServer
+
+<PageTitle>Eliminar Aporte</PageTitle>
+<div class="container">
+	<div class="card shadow-lg">
+		@*Header*@
+		<div class="card-header">
+			<h3><strong>Eliminar Aporte</strong></h3>
+		</div>
+		@*Body*@
+		<div class="card-body col-5">
+			<h3><strong>¿Éstas seguro de que quieres eliminar este aporte?</strong></h3>
+			@*Datos*@
+			<div class="mb-1">
+				<p class="mb-0">Aporte Id: @aporte.AporteId</p>
+			</div>
+			<div class="mb-1">
+				<p class="mb-0">Fecha: @aporte.Fecha</p>
+			</div>
+			<div class="mb-1">
+				<p class="mb-0">Persona: @aporte.Persona</p>
+			</div>
+			<div class="mb-1">
+				<p class="mb-0">Observaci&oacute;n: @aporte.Observacion</p>
+			</div>
+			<div class="mb-1">
+				<p class="mb-0">Monto: @aporte.Monto</p>
+			</div>
+		</div>
+		@*Footer*@
+		<div class="card-footer d-flex justify-content-center">
+			<div class="px-2">
+				<button type="button" class="btn btn-outline-danger" @onclick="Eliminar">Eliminar</button>
+			</div>
+			<button type="button" class="btn btn-outline-dark" @onclick="Volver">Cancelar</button>
+		</div>
+	</div>
+</div>
+@mensaje
+@code {
+	[Parameter]
+	public int aporteId { get; set; }
+	public Aportes aporte { get; set; } = new Aportes();
+	public string mensaje { get; set; } = string.Empty;
+
+	protected override async Task OnInitializedAsync()
+	{
+		await Task.Delay(500);
+
+		if (aporteId > 0)
+			aporte = await aportesService.Buscar(aporteId);
+	}
+
+	public async Task Eliminar()
+	{
+		var eliminar = await aportesService.Eliminar(aporte);
+		if (eliminar)
+		{
+			mensaje = "El aporte se ha eliminado con éxito";
+			await Task.Delay(2000);
+			Volver();
+		}
+		else
+			mensaje = "No se ha podido eliminar el aporte Correctamente";
+	}
+
+	public void Volver()
+	{
+		navigation.NavigateTo("/DetailsAportes");
+	}
+}
