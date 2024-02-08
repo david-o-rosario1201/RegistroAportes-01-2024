@@ -19,6 +19,43 @@
 			}
 			else
 			{
+				@*Fechas*@
+				<div class="mb-3">
+					<div class="row">
+						<div class="col-3">
+							<label class="form-label" for="desde"><strong>Desde:</strong></label>
+							<InputDate id="desde" class="form-control" @bind-Value="desde"></InputDate>
+						</div>
+						<div class="col-3">
+							<label class="form-label" for="hasta"><strong>Hasta:</strong></label>
+							<InputDate id="hasta" class="form-control" @bind-Value="hasta"></InputDate>
+						</div>
+					</div>
+				</div>
+
+				@*Campo filtro*@
+				<div class="mb-3">
+					<div class="row">
+						<label class="form-label" for="filtrar"><strong>Campo a Filtrar:</strong></label>
+						<div class="col-3">
+							<InputSelect id="filtrar" class="form-select" @bind-Value="filtrar" @oninput="(e) => ActualizarFiltro(e.Value.ToString())">
+								<option>Seleccione una opcion para filtrar</option>
+								<option value="aporte id">Aporte Id</option>
+								<option value="persona">Persona</option>
+							</InputSelect>
+						</div>
+						<div class="col-1">
+							=>
+						</div>
+						<div class="col-3">
+							<div class="input-group">
+								<InputText class="form-control" @bind-Value="valorFiltrar"></InputText>
+								<button class="btn btn-outline-primary" @onclick="Buscar">Buscar</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
 				<table class="table">
 					<thead>
 						<tr>
@@ -41,8 +78,9 @@
 								<td>@aporte.Observacion</td>
 								<td>@aporte.Monto</td>
 								<td><a href="/EditAportes/aporteid=@aporte.AporteId"><i class="bi bi-pencil-square"/></a></td>
-								<td><a href="/DeleteAportes/aporteid=@aporte.AporteId"></a><i class="bi bi-trash3-fill"/></td>
+								<td><a href="/DeleteAportes/aporteid=@aporte.AporteId"><i class="bi bi-trash3-fill"/></a></td>
 							</tr>
+							montoTotal = aportes.Sum(aporte => aporte.Monto);
 						}
 					</tbody>
 				</table>
@@ -51,17 +89,80 @@
 		@*Footer*@
 		<div class="card-footer">
 			<p><strong>Total de Aportes:</strong> @aportes.Count</p>
+			<p><strong>Monto Total:</strong> @montoTotal</p>
 		</div>
 	</div>
 </div>
+@mensaje
+
 @code {
 	public List<Aportes> aportes = new List<Aportes>();
+	public decimal montoTotal { get; set; } = 0;
+	public DateTime desde { get; set; } = DateTime.Now;
+	public DateTime hasta { get; set; } = DateTime.Now;
+	public string filtrar { get; set; }
+	public string valorFiltrar { get; set; }
+	public string tipoValor { get; set; }
+	public string mensaje { get; set; }
 
 	protected override async Task OnInitializedAsync()
 	{
 		await Task.Delay(500);
 		Expression<Func<Aportes, bool>> criterio = a => a.AporteId > 0;
 		aportes = await aportesService.Listar(criterio);
+	}
+
+	public async Task Buscar()
+	{
+		if (desde > hasta)
+		{
+			mensaje = "La fecha inicial no debe ser mayor a la fecha final";
+			await Task.Delay(3000);
+			mensaje = string.Empty;
+			return;
+		}
+
+		List<Aportes> filtradoList1 = new List<Aportes>();
+
+		if (tipoValor == "aporte id")
+		{
+			int id = int.Parse(valorFiltrar);
+			Console.WriteLine(id);
+			Expression<Func<Aportes, bool>> criterio = a => a.AporteId == id;
+			filtradoList1 = await aportesService.Listar(criterio);
+			Filtrado(filtradoList1);
+		}
+		else
+		{
+			Expression<Func<Aportes, bool>> criterio = a => a.Persona == valorFiltrar;
+			filtradoList1 = await aportesService.Listar(criterio);
+			Filtrado(filtradoList1);
+		}
+	}
+
+	public async Task Filtrado(List<Aportes> filtrados)
+	{
+		List<Aportes> filtradoList2 = new List<Aportes>();
+		foreach (var filtrado in filtrados)
+		{
+			if (filtrado.Fecha >= desde && filtrado.Fecha <= hasta)
+				filtradoList2.Add(filtrado);
+		}
+
+		if (filtradoList2.Count != 0)
+			aportes = filtradoList2;
+		else
+		{
+			mensaje = "No se encontraron resultados";
+			await Task.Delay(3000);
+			mensaje = string.Empty;
+		}
+	}
+
+	public async Task ActualizarFiltro(string valor)
+	{
+		tipoValor = valor;
+		montoTotal = 0;
 	}
 
 	public void Volver()
