@@ -80,7 +80,6 @@
 								<td><a href="/EditAportes/aporteid=@aporte.AporteId"><i class="bi bi-pencil-square"/></a></td>
 								<td><a href="/DeleteAportes/aporteid=@aporte.AporteId"><i class="bi bi-trash3-fill"/></a></td>
 							</tr>
-							montoTotal = aportes.Sum(aporte => aporte.Monto);
 						}
 					</tbody>
 				</table>
@@ -116,6 +115,7 @@
 		await Task.Delay(500);
 		Expression<Func<Aportes, bool>> criterio = a => a.AporteId > 0;
 		aportes = await aportesService.Listar(criterio);
+		montoTotal = aportes.Sum(aporte => aporte.Monto);
 	}
 
 	public async Task Buscar()
@@ -128,7 +128,7 @@
 			return;
 		}
 
-		if (valorFiltrar == null)
+		if (filtrar == null)
 		{
 			mensaje = "Debe ingresar un dato";
 			await Task.Delay(3000);
@@ -137,15 +137,15 @@
 
 		List<Aportes> filtradoList1 = new List<Aportes>();
 
-		if (tipoValor == "aporte id")
+		if (filtrar == "aporte id")
 		{
-			int id = int.Parse(valorFiltrar);
+			int id = int.Parse(filtrar);
 			Console.WriteLine(id);
 			Expression<Func<Aportes, bool>> criterio = a => a.AporteId == id;
 			filtradoList1 = await aportesService.Listar(criterio);
 			Filtrado(filtradoList1);
 		}
-		else if (tipoValor == "persona")
+		else if (filtrar == "persona")
 		{
 			Expression<Func<Aportes, bool>> criterio = a => a.Persona == valorFiltrar;
 			filtradoList1 = await aportesService.Listar(criterio);
@@ -176,12 +176,6 @@
 			await Task.Delay(3000);
 			mensaje = string.Empty;
 		}
-	}
-
-	public async Task ActualizarFiltro(string valor)
-	{
-		tipoValor = valor;
-		montoTotal = 0;
 	}
 
 	public void Volver()
