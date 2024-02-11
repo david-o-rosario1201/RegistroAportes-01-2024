@@ -1,85 +1,87 @@
 ﻿@page "/CreateAportes"
 @inject AportesService aportesService
-@inject NavigationManager navigation
 @rendermode InteractiveServer
+@attribute [StreamRendering]
+@inject NavigationManager navigation
 
 <PageTitle>Crear Nuevo Aporte</PageTitle>
 <EditForm Model="aporte" OnValidSubmit="Crear">
-	<DataAnnotationsValidator/>
-		<div class="container">
-			<div class="card shadow-lg">
-				@*Header*@
-				<div class="card-header">
-					<h3><strong>Crear Nuevo Aporte</strong></h3>
-				</div>
-				@*Body*@
-				<div class="card-body">
-					@*Aporte Id*@
-					<div class="mb-3">
-						<div class="col-4">
-							<label class="form-label" for="aporteid"><strong>Aporte Id:</strong></label>
-							<InputNumber id="aporteid" class="form-control" @bind-Value="aporte.AporteId"></InputNumber>
-						</div>
-					</div>
-					@*Fecha*@
-					<div class="mb-3">
-						<div class="col-4">
-							<label class="form-label" for="fecha"><strong>Fecha:</strong></label>
-							<InputDate id="fecha" class="form-control" @bind-Value="aporte.Fecha"></InputDate>
-							<ValidationMessage For="@(() => aporte.Fecha)"></ValidationMessage>
-						</div>
-					</div>
-					@*Persona*@
-					<div class="mb-3">
-						<div class="col-4">
-							<label class="form-label" for="persona"><strong>Persona:</strong></label>
-							<InputText id="persona" class="form-control" @bind-Value="aporte.Persona" placeholder="Escriba su nombre"></InputText>
-							<ValidationMessage For="@(() => aporte.Persona)"></ValidationMessage>
-						</div>
-					</div>
-					@*Observación*@
-					<div class="mb-3">
-						<div class="col-4">
-							<label class="form-label" for="observacion"><strong>Observaci&oacute;n:</strong></label>
-							<InputTextArea id="observacion" class="form-control" @bind-Value="aporte.Observacion" placeholder="Ingrese una observación"></InputTextArea>
-							<ValidationMessage For="@(() => aporte.Observacion)"></ValidationMessage>
-						</div>
-					</div>
-					@*Monto*@
-					<div class="mb-3">
-						<div class="col-4">
-							<label class="form-label" for="monto"><strong>Monto:</strong></label>
-							<InputNumber id="monto" class="form-control" @bind-Value="aporte.Monto"></InputNumber>
-							<ValidationMessage For="@(() => aporte.Monto)"></ValidationMessage>
-						</div>
+	<DataAnnotationsValidator />
+	<div class="container">
+		<div class="card shadow-lg">
+			@*Header*@
+			<div class="card-header">
+				<h3><strong>Crear Nuevo Aporte</strong></h3>
+			</div>
+			@*Body*@
+			<div class="card-body">
+				@*AporteId*@
+				<div class="mb-3">
+					<div class="col-4">
+						<label class="form-label" for="aporteid"><strong>Aporte Id:</strong></label>
+						<InputNumber id="aporteid" class="form-control" @bind-Value="aporte.AporteId"></InputNumber>
 					</div>
 				</div>
-				@*Footer*@
-				<div class="card-footer d-flex justify-content-center">
-					<div class="px-2">
-						<button type="button" class="btn btn-outline-primary" @onclick="Volver">Volver</button>
+				@*Fecha*@
+				<div class="mb-3">
+					<div class="col-4">
+						<label class="form-label" for="fecha"><strong>Fecha:</strong></label>
+						<InputDate id="fecha" class="form-control" @bind-Value="aporte.Fecha"></InputDate>
+						<ValidationMessage For="@(() => aporte.Fecha)"></ValidationMessage>
 					</div>
-					<button type="submit" class="btn btn-outline-success">Crear</button>
+				</div>
+				@*Persona*@
+				<div class="mb-3">
+					<div class="col-4">
+						<label class="form-label" for="persona"><strong>Persona:</strong></label>
+						<InputText id="persona" class="form-control" @bind-Value="aporte.Persona" placeholder="Escriba su nombre"></InputText>
+						<ValidationMessage For="@(() => aporte.Persona)"></ValidationMessage>
+					</div>
+				</div>
+				@*Observación*@
+				<div class="mb-3">
+					<div class="col-4">
+						<label class="form-label" for="observacion"><strong>Observaci&oacute;n:</strong></label>
+						<InputTextArea id="observacion" class="form-control" @bind-Value="aporte.Observacion" placeholder="Escriba una observación"></InputTextArea>
+						<ValidationMessage For="@(() => aporte.Observacion)"></ValidationMessage>
+					</div>
+				</div>
+				@*Monto*@
+				<div class="mb-3">
+					<div class="col-4">
+						<label class="form-label" for="monto"><strong>Monto:</strong></label>
+						<InputNumber id="monto" class="form-control" @bind-Value="aporte.Monto"></InputNumber>
+						<ValidationMessage For="@(() => aporte.Monto)"></ValidationMessage>
+					</div>
 				</div>
 			</div>
+			@*Footer*@
+			<div class="card-footer d-flex justify-content-center">
+				<div class="px-2">
+					<button type="button" class="btn btn-outline-primary" @onclick="Volver"><i class="bi bi-box-arrow-left" /> Volver</button>
+				</div>
+				<button type="submit" class="btn btn-outline-success"><i class="bi bi-floppy-fill" /> Crear</button>
+			</div>
 		</div>
-		@mensaje
+	</div>
+	@mensaje
 </EditForm>
+
 @code {
 	public Aportes aporte { get; set; } = new Aportes();
-	public string mensaje { get; set; } = string.Empty;
+	public string mensaje { get; set; }
 
 	public async Task Crear()
 	{
 		var crear = await aportesService.Crear(aporte);
 		if (crear)
 		{
-			mensaje = "El aporte se ha creado con éxito";
+			mensaje = "El aporte se creó con éxito";
 			await Task.Delay(2000);
 			LimpiarPantalla();
 		}
 		else
-			mensaje = "No se ha podido crear el aporte Correctamente";
+			mensaje = "El aporte no es ha podido crear correctamente";
 	}
 
 	public void LimpiarPantalla()

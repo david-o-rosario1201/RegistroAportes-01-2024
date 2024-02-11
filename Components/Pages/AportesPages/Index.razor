@@ -1,8 +1,8 @@
 ﻿@page "/Aportes"
 @inject AportesService aportesService
-@inject NavigationManager navigation
 @rendermode InteractiveServer
 @attribute [StreamRendering]
+@inject NavigationManager navigation
 
 <PageTitle>Aportes</PageTitle>
 <div class="container">
@@ -10,12 +10,12 @@
 		@*Header*@
 		<div class="card-header">
 			<h3><strong>Aportes</strong></h3>
-			<button type="button" class="btn btn-outline-primary" @onclick="IrACrear">Crear</button>
-			<button type="button" class="btn btn-outline-info" @onclick="IrADetalles">Detalles</button>
+			<button type="button" class="btn btn-outline-primary" @onclick="IrACrear"><i class="bi bi-plus-circle" /> Crear</button>
+			<button type="button" class="btn btn-outline-info" @onclick="IrADetalles"><i class="bi bi-card-list" /> Detalles</button>
 		</div>
 		@*Body*@
 		<div class="card-body">
-			@if(aportes.Count == 0)
+			@if (aportes.Count == 0)
 			{
 				<p><em>Cargando...</em></p>
 			}
@@ -35,13 +35,13 @@
 					</div>
 				</div>
 
-				@*Campo filtro*@
+				@*Campos a Filtrar*@
 				<div class="mb-3">
 					<div class="row align-items-center">
-						<label class="form-label" for="filtrar"><strong>Campo a Filtrar:</strong></label>
+						<label class="form-label" for="filtro"><strong>Campo a Filtrar:</strong></label>
 						<div class="col-3">
-							<InputSelect id="filtrar" class="form-select" @bind-Value="filtrar">
-								<option>Seleccione una opción</option>
+							<InputSelect id="filtro" class="form-select" @bind-Value="filtro">
+								<option>Elije una opci&oacute;n</option>
 								<option value="aporte id">Aporte Id</option>
 								<option value="persona">Persona</option>
 							</InputSelect>
@@ -51,9 +51,12 @@
 						</div>
 						<div class="col-4">
 							<div class="input-group">
-								<InputText class="form-control" @bind-Value="valorFiltrar" placeholder="Escriba un dato para filtrar"></InputText>
-								<button class="btn btn-outline-primary" @onclick="Buscar">Buscar</button>
+								<InputText class="form-control" @bind-Value="valorFiltro" placeholder="Ingrese un dato para filtrar"></InputText>
+								<button type="button" class="btn btn-outline-primary" @onclick="Buscar"><i class="bi bi-search" /></button>
 							</div>
+						</div>
+						<div class="col-3">
+							<button type="button" class="btn btn-outline-secondary" @onclick="Restablecer"><i class="bi bi-arrow-clockwise" /> Restablecer</button>
 						</div>
 					</div>
 				</div>
@@ -69,7 +72,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						@foreach(var aporte in aportes)
+						@foreach (var aporte in aportes)
 						{
 							<tr>
 								<td>@aporte.AporteId</td>
@@ -100,12 +103,11 @@
 
 @code {
 	public List<Aportes> aportes = new List<Aportes>();
-	public decimal montoTotal { get; set; } = 0;
+	public decimal montoTotal { get; set; }
 	public DateTime desde { get; set; } = DateTime.Now;
 	public DateTime hasta { get; set; } = DateTime.Now;
-	public string filtrar { get; set; }
-	public string valorFiltrar { get; set; }
-	public string tipoValor { get; set; }
+	public string filtro { get; set; }
+	public string valorFiltro { get; set; }
 	public string mensaje { get; set; }
 
 	protected override async Task OnInitializedAsync()
@@ -113,54 +115,72 @@
 		await Task.Delay(500);
 		Expression<Func<Aportes, bool>> criterio = a => a.AporteId > 0;
 		aportes = await aportesService.Listar(criterio);
-		montoTotal = aportes.Sum(aporte => aporte.Monto);
+		montoTotal = aportes.Sum(a => a.Monto);
+	}
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		montoTotal = aportes.Sum(a => a.Monto);
+		StateHasChanged();
 	}
 
 	public async Task Buscar()
 	{
 		if (desde > hasta)
 		{
-			mensaje = "La fecha inicial no debe ser mayor a la fecha final";
+			mensaje = "La fecha inicial no puede ser mayor a la fecha final";
 			await Task.Delay(3000);
 			mensaje = string.Empty;
 			return;
 		}
-
-		if (filtrar == null)
+		if (valorFiltro == null)
 		{
 			mensaje = "Debe ingresar un dato";
 			await Task.Delay(3000);
+			mensaje = string.Empty;
 			return;
 		}
-
 		List<Aportes> filtradoList1 = new List<Aportes>();
-
-		if(filtrar == "aporte id")
+		if (filtro == "aporte id")
 		{
-			int id = int.Parse(filtrar);
-			Console.WriteLine(id);
-			Expression<Func<Aportes, bool>> criterio = a => a.AporteId == id;
-			filtradoList1 = await aportesService.Listar(criterio);
-			Filtrado(filtradoList1);
+			if (int.TryParse(valorFiltro, out int id))
+			{
+				Expression<Func<Aportes, bool>> criterio = a => a.AporteId == id;
+				filtradoList1 = await aportesService.Listar(criterio);
+				Filtrado(filtradoList1);
+			}
+			else
+			{
+				mensaje = "El valor ingresado para AporteId no es válido";
+				await Task.Delay(3000);
+				mensaje = string.Empty;
+			}
 		}
-		else if (filtrar == "persona")
+		else if (filtro == "persona")
 		{
-			Expression<Func<Aportes, bool>> criterio = a => a.Persona == valorFiltrar;
+			Expression<Func<Aportes, bool>> criterio = a => a.Persona == valorFiltro;
 			filtradoList1 = await aportesService.Listar(criterio);
 			Filtrado(filtradoList1);
 		}
 		else
 		{
-			mensaje = "Debe elegir una opción para filtrar";
+			mensaje = "Debe elegir un método parar filtrar";
 			await Task.Delay(3000);
 			mensaje = string.Empty;
 		}
 	}
 
+	public async Task Restablecer()
+	{
+		Expression<Func<Aportes, bool>> criterio = a => a.AporteId > 0;
+		aportes = await aportesService.Listar(criterio);
+		montoTotal = aportes.Sum(a => a.Monto);
+	}
+
 	public async Task Filtrado(List<Aportes> filtrados)
 	{
 		List<Aportes> filtradoList2 = new List<Aportes>();
-		foreach(var filtrado in filtrados)
+		foreach (var filtrado in filtrados)
 		{
 			if (filtrado.Fecha >= desde && filtrado.Fecha <= hasta)
 				filtradoList2.Add(filtrado);
@@ -180,7 +200,6 @@
 	{
 		navigation.NavigateTo("/CreateAportes");
 	}
-
 	public void IrADetalles()
 	{
 		navigation.NavigateTo("/DetailsAportes");

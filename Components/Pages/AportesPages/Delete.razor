@@ -1,8 +1,9 @@
 ﻿@page "/DeleteAportes"
-@page "/DeleteAportes/aporteid={aporteid:int}"
+@page "/DeleteAportes/aporteid={aporteId:int}"
 @inject AportesService aportesService
-@inject NavigationManager navigation
 @rendermode InteractiveServer
+@attribute [StreamRendering]
+@inject NavigationManager navigation
 
 <PageTitle>Eliminar Aporte</PageTitle>
 <div class="container">
@@ -34,23 +35,23 @@
 		@*Footer*@
 		<div class="card-footer d-flex justify-content-center">
 			<div class="px-2">
-				<button type="button" class="btn btn-outline-danger" @onclick="Eliminar">Eliminar</button>
+				<button type="button" class="btn btn-outline-dark" @onclick="Volver"><i class="bi bi-box-arrow-left" /> Volver</button>
 			</div>
-			<button type="button" class="btn btn-outline-dark" @onclick="Volver">Cancelar</button>
+			<button type="button" class="btn btn-outline-danger" @onclick="Eliminar"><i class="bi bi-trash3-fill" /> Eliminar</button>
 		</div>
 	</div>
 </div>
 @mensaje
+
 @code {
 	[Parameter]
 	public int aporteId { get; set; }
 	public Aportes aporte { get; set; } = new Aportes();
-	public string mensaje { get; set; } = string.Empty;
+	public string mensaje { get; set; }
 
 	protected override async Task OnInitializedAsync()
 	{
 		await Task.Delay(500);
-
 		if (aporteId > 0)
 			aporte = await aportesService.Buscar(aporteId);
 	}
@@ -60,12 +61,12 @@
 		var eliminar = await aportesService.Eliminar(aporte);
 		if (eliminar)
 		{
-			mensaje = "El aporte se ha eliminado con éxito";
+			mensaje = "El aporte se eliminó con éxito";
 			await Task.Delay(2000);
 			Volver();
 		}
 		else
-			mensaje = "No se ha podido eliminar el aporte Correctamente";
+			mensaje = "El aporte no es ha podido eliminar correctamente";
 	}
 
 	public void Volver()

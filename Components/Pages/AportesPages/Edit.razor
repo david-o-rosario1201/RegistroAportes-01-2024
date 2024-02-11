@@ -1,21 +1,22 @@
 ﻿@page "/EditAportes"
 @page "/EditAportes/aporteid={aporteId:int}"
 @inject AportesService aportesService
-@inject NavigationManager navigation
 @rendermode InteractiveServer
+@attribute [StreamRendering]
+@inject NavigationManager navigation
 
-<PageTitle>Crear Nuevo Aporte</PageTitle>
+<PageTitle>Editar Aporte</PageTitle>
 <EditForm Model="aporte" OnValidSubmit="Modificar">
 	<DataAnnotationsValidator />
 	<div class="container">
 		<div class="card shadow-lg">
 			@*Header*@
 			<div class="card-header">
-				<h3><strong>Crear Nuevo Aporte</strong></h3>
+				<h3><strong>Editar Aporte</strong></h3>
 			</div>
 			@*Body*@
 			<div class="card-body">
-				@*Aporte Id*@
+				@*AporteId*@
 				<div class="mb-3">
 					<div class="col-4">
 						<label class="form-label" for="aporteid"><strong>Aporte Id:</strong></label>
@@ -42,7 +43,7 @@
 				<div class="mb-3">
 					<div class="col-4">
 						<label class="form-label" for="observacion"><strong>Observaci&oacute;n:</strong></label>
-						<InputTextArea id="observacion" class="form-control" @bind-Value="aporte.Observacion" placeholder="Ingrese una observación"></InputTextArea>
+						<InputTextArea id="observacion" class="form-control" @bind-Value="aporte.Observacion" placeholder="Escriba una observación"></InputTextArea>
 						<ValidationMessage For="@(() => aporte.Observacion)"></ValidationMessage>
 					</div>
 				</div>
@@ -58,24 +59,24 @@
 			@*Footer*@
 			<div class="card-footer d-flex justify-content-center">
 				<div class="px-2">
-					<button type="button" class="btn btn-outline-primary" @onclick="Volver">Volver</button>
+					<button type="button" class="btn btn-outline-primary" @onclick="Volver"><i class="bi bi-box-arrow-left" /> Volver</button>
 				</div>
-				<button type="submit" class="btn btn-outline-success">Modificar</button>
+				<button type="submit" class="btn btn-outline-success"><i class="bi bi-floppy-fill" /> Modificar</button>
 			</div>
 		</div>
 	</div>
 	@mensaje
 </EditForm>
+
 @code {
 	[Parameter]
 	public int aporteId { get; set; }
 	public Aportes aporte { get; set; } = new Aportes();
-	public string mensaje { get; set; } = string.Empty;
+	public string mensaje { get; set; }
 
 	protected override async Task OnInitializedAsync()
 	{
 		await Task.Delay(500);
-
 		if (aporteId > 0)
 			aporte = await aportesService.Buscar(aporteId);
 	}
@@ -85,12 +86,12 @@
 		var modificar = await aportesService.Crear(aporte);
 		if (modificar)
 		{
-			mensaje = "El aporte se ha modificado con éxito";
+			mensaje = "El aporte se modificó con éxito";
 			await Task.Delay(2000);
 			Volver();
 		}
 		else
-			mensaje = "No se ha podido modificar el aporte Correctamente";
+			mensaje = "El aporte no es ha podido modificar correctamente";
 	}
 
 	public void Volver()
