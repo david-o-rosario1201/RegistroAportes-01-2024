@@ -40,7 +40,7 @@
 					<div class="row align-items-center">
 						<label class="form-label" for="filtrar"><strong>Campo a Filtrar:</strong></label>
 						<div class="col-3">
-							<InputSelect id="filtrar" class="form-select" @bind-Value="filtrar" @oninput="(e) => ActualizarFiltro(e.Value.ToString())">
+							<InputSelect id="filtrar" class="form-select" @bind-Value="filtrar">
 								<option>Seleccione una opción</option>
 								<option value="aporte id">Aporte Id</option>
 								<option value="persona">Persona</option>
@@ -78,7 +78,6 @@
 								<td>@aporte.Observacion</td>
 								<td>@aporte.Monto</td>
 							</tr>
-							montoTotal = aportes.Sum(aporte => aporte.Monto);
 						}
 					</tbody>
 				</table>
@@ -114,6 +113,7 @@
 		await Task.Delay(500);
 		Expression<Func<Aportes, bool>> criterio = a => a.AporteId > 0;
 		aportes = await aportesService.Listar(criterio);
+		montoTotal = aportes.Sum(aporte => aporte.Monto);
 	}
 
 	public async Task Buscar()
@@ -126,7 +126,7 @@
 			return;
 		}
 
-		if (valorFiltrar == null)
+		if (filtrar == null)
 		{
 			mensaje = "Debe ingresar un dato";
 			await Task.Delay(3000);
@@ -135,15 +135,15 @@
 
 		List<Aportes> filtradoList1 = new List<Aportes>();
 
-		if(tipoValor == "aporte id")
+		if(filtrar == "aporte id")
 		{
-			int id = int.Parse(valorFiltrar);
+			int id = int.Parse(filtrar);
 			Console.WriteLine(id);
 			Expression<Func<Aportes, bool>> criterio = a => a.AporteId == id;
 			filtradoList1 = await aportesService.Listar(criterio);
 			Filtrado(filtradoList1);
 		}
-		else if(tipoValor == "persona")
+		else if (filtrar == "persona")
 		{
 			Expression<Func<Aportes, bool>> criterio = a => a.Persona == valorFiltrar;
 			filtradoList1 = await aportesService.Listar(criterio);
@@ -174,12 +174,6 @@
 			await Task.Delay(3000);
 			mensaje = string.Empty;
 		}
-	}
-
-	public async Task ActualizarFiltro(string valor)
-	{
-		tipoValor = valor;
-		montoTotal = 0;
 	}
 
 	public void IrACrear()
