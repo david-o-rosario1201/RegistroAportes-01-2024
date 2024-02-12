@@ -78,7 +78,7 @@
 						{
 							<tr>
 								<td>@aporte.AporteId</td>
-								<td>@aporte.Fecha</td>
+								<td>@aporte.Fecha.ToShortDateString()</td>
 								<td>@aporte.Persona</td>
 								<td>@aporte.Observacion</td>
 								<td>@aporte.Monto</td>
@@ -109,8 +109,8 @@
 @code {
 	public List<Aportes> aportes = new List<Aportes>();
 	public decimal montoTotal { get; set; }
-	public DateTime desde { get; set; } = DateTime.Now;
-	public DateTime hasta { get; set; } = DateTime.Now;
+	public DateTime desde { get; set; } = DateTime.Today;
+	public DateTime hasta { get; set; } = DateTime.Today;
 	public string filtro { get; set; }
 	public string valorFiltro { get; set; }
 	public string mensaje { get; set; }
@@ -118,8 +118,7 @@
 	protected override async Task OnInitializedAsync()
 	{
 		await Task.Delay(500);
-		Expression<Func<Aportes, bool>> criterio = a => a.AporteId > 0;
-		aportes = await aportesService.Listar(criterio);
+		aportes = await aportesService.Listar(a => a.AporteId > 0);
 		montoTotal = aportes.Sum(a => a.Monto);
 	}
 
@@ -150,8 +149,7 @@
 		{
 			if (int.TryParse(valorFiltro, out int id))
 			{
-				Expression<Func<Aportes, bool>> criterio = a => a.AporteId == id;
-				filtradoList1 = await aportesService.Listar(criterio);
+				filtradoList1 = await aportesService.Listar(a => a.AporteId == id);
 				Filtrado(filtradoList1);
 			}
 			else
@@ -163,8 +161,7 @@
 		}
 		else if (filtro == "persona")
 		{
-			Expression<Func<Aportes, bool>> criterio = a => a.Persona == valorFiltro;
-			filtradoList1 = await aportesService.Listar(criterio);
+			filtradoList1 = await aportesService.Listar(a => a.Persona == valorFiltro);
 			Filtrado(filtradoList1);
 		}
 		else
@@ -177,8 +174,7 @@
 
 	public async Task Restablecer()
 	{
-		Expression<Func<Aportes, bool>> criterio = a => a.AporteId > 0;
-		aportes = await aportesService.Listar(criterio);
+		aportes = await aportesService.Listar(a => a.AporteId > 0);
 		montoTotal = aportes.Sum(a => a.Monto);
 	}
 

@@ -9,7 +9,7 @@ public class Aportes
 	public int AporteId { get; set; }
 
 	[DataType(DataType.Date)]
-	public DateTime Fecha { get; set; } = DateTime.Now;
+	public DateTime Fecha { get; set; } = DateTime.Today;
 
 	[Required(ErrorMessage = "Debe ingresar un nombre")]
 	[RegularExpression(@"^[A-Za-z ]+$", ErrorMessage = "El nombre no debe contener números ni caracteres especiales")]
