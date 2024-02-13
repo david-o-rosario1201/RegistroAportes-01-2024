@@ -4,6 +4,7 @@
 @rendermode InteractiveServer
 @attribute [StreamRendering]
 @inject NavigationManager navigation
+@inject ToastService toastService
 
 <PageTitle>Eliminar Aporte</PageTitle>
 <div class="container">
@@ -41,13 +42,14 @@
 		</div>
 	</div>
 </div>
-@mensaje
+
+<Toast @ref="toastService.ToastComponent" Duration="4000" IconClass="bi bi-info-circle" Persist="true"/>
+
 
 @code {
 	[Parameter]
 	public int aporteId { get; set; }
 	public Aportes aporte { get; set; } = new Aportes();
-	public string mensaje { get; set; }
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -61,13 +63,16 @@
 		var eliminar = await aportesService.Eliminar(aporte);
 		if (eliminar)
 		{
-			mensaje = "El aporte se eliminó con éxito";
+			ShowToastSuccess();
 			await Task.Delay(2000);
 			Volver();
 		}
 		else
-			mensaje = "El aporte no es ha podido eliminar correctamente";
+			ShowToastFail();
 	}
+
+	public void ShowToastSuccess() => toastService.ShowSuccessToast("Eliminar Aporte", "El aporte se eliminó con éxito");
+	public void ShowToastFail() => toastService.ShowDangerToast("Eliminar Aporte", "El aporte no es ha podido eliminar correctamente");
 
 	public void Volver()
 	{

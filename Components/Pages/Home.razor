@@ -1,7 +1,23 @@
 ﻿@page "/"
+@inject ToastService toastService
+@rendermode InteractiveServer
 
 <PageTitle>Home</PageTitle>
 
 <h1>Hello, world!</h1>
 
 Welcome to your new app.
+
+@*
+<Toast Duration="400" IconClass=" bi bi-check" Persist="false">
+
+</Toast>
+*@
+
+<button class="btn btn-primary" @onclick="ShowToast">Show Toast</button>
+<Toast @ref="toastService.ToastComponent"></Toast>
+
+@code{
+
+	public void ShowToast()=> toastService.ShowSuccessToast("Custem title","Custom message");
+}
