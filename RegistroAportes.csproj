@@ -14,6 +14,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="NetcodeHub.Packages.Components.Toast" Version="1.0.1" />
   </ItemGroup>
 
   <ItemGroup>

@@ -4,9 +4,10 @@
 @rendermode InteractiveServer
 @attribute [StreamRendering]
 @inject NavigationManager navigation
+@inject ToastService toastService
 
 <PageTitle>Editar Aporte</PageTitle>
-<EditForm Model="aporte" OnValidSubmit="Modificar">
+<EditForm Model="aporte" OnValidSubmit="Modificar" OnInvalidSubmit="ShowToastFail">
 	<DataAnnotationsValidator />
 	<div class="container">
 		<div class="card shadow-lg">
@@ -65,14 +66,14 @@
 			</div>
 		</div>
 	</div>
-	@mensaje
 </EditForm>
+
+<Toast @ref="toastService.ToastComponent" Duration="4000" IconClass="bi bi-info-circle" Persist="true"/>
 
 @code {
 	[Parameter]
 	public int aporteId { get; set; }
 	public Aportes aporte { get; set; } = new Aportes();
-	public string mensaje { get; set; }
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -86,13 +87,16 @@
 		var modificar = await aportesService.Crear(aporte);
 		if (modificar)
 		{
-			mensaje = "El aporte se modificó con éxito";
+			ShowToastSuccess();
 			await Task.Delay(2000);
 			Volver();
 		}
 		else
-			mensaje = "El aporte no es ha podido modificar correctamente";
+			ShowToastFail();
 	}
+
+	public void ShowToastSuccess() => toastService.ShowSuccessToast("Editar Aporte", "El aporte se modificó con éxito");
+	public void ShowToastFail() => toastService.ShowDangerToast("Editar Aporte", "No pueden haber campos vacíos");
 
 	public void Volver()
 	{

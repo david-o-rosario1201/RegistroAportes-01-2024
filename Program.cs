@@ -1,7 +1,9 @@
+//using Blazored.Toast.Services;
 using Microsoft.EntityFrameworkCore;
 using RegistroAportes.Components;
 using RegistroAportes.DAL;
 using RegistroAportes.Services;
+using NetcodeHub.Packages.Components.Toast;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +15,7 @@ builder.Services.AddDbContext<Contexto>
 	(o => o.UseSqlite(builder.Configuration.GetConnectionString("ConStr")));
 
 builder.Services.AddScoped<AportesService>();
+builder.Services.AddScoped<ToastService>();
 
 var app = builder.Build();
 

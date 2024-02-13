@@ -3,9 +3,10 @@
 @rendermode InteractiveServer
 @attribute [StreamRendering]
 @inject NavigationManager navigation
+@inject ToastService toastService
 
 <PageTitle>Crear Nuevo Aporte</PageTitle>
-<EditForm Model="aporte" OnValidSubmit="Crear">
+<EditForm Model="aporte" OnValidSubmit="Crear" OnInvalidSubmit="ShowToastFail">
 	<DataAnnotationsValidator />
 	<div class="container">
 		<div class="card shadow-lg">
@@ -65,7 +66,6 @@
 				<div class="px-2">
 					<button type="submit" class="btn btn-outline-success"><i class="bi bi-floppy-fill" /> Crear</button>
 				</div>
-				<button type="button" class="btn btn-outline-primary" id="liveToastBtn" @onclick="MostrarToast">Show live toast</button>
 
 				<!--
 				<div class="toast-container position-fixed bottom-0 end-0 p-3">
@@ -82,32 +82,16 @@
 					</div>
 				</div>
 				-->
-				@if (guardo)
-				{
-					<div class="toast-container position-fixed bottom-0 end-0 p-3">
-						<div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-							<div class="toast-header">
-								<img src="..." class="rounded me-2" alt="...">
-								<strong class="me-auto">Bootstrap</strong>
-								<small>11 mins ago</small>
-								<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-							</div>
-							<div class="toast-body">
-								Hello, world! This is a toast message.
-							</div>
-						</div>
-					</div>
-				}
 
 			</div>
 		</div>
 	</div>
-	@mensaje
 </EditForm>
+
+<Toast @ref="toastService.ToastComponent" Duration="4000" IconClass="bi bi-info-circle" Persist="true" />
 
 @code {
 	public Aportes aporte { get; set; } = new Aportes();
-	public string mensaje { get; set; }
 	public bool guardo { get; set; }
 
 	public async Task Crear()
@@ -115,24 +99,22 @@
 		var crear = await aportesService.Crear(aporte);
 		if (crear)
 		{
-			mensaje = "El aporte se creó con éxito";
+			//mensaje = "El aporte se creó con éxito";
+			ShowToastSuccess();
 			await Task.Delay(2000);
 			LimpiarPantalla();
 		}
 		else
-			mensaje = "El aporte no es ha podido crear correctamente";
+			ShowToastFail();
 	}
 
-	public void MostrarToast()
-	{
-		guardo = true;
-	}
+	public void ShowToastSuccess() => toastService.ShowSuccessToast("Crear aporte", "El aporte se creó con éxito");
+	public void ShowToastFail() => toastService.ShowDangerToast("Crear aporte", "No pueden haber campos vacíos");
 
 
 	public void LimpiarPantalla()
 	{
 		aporte = new Aportes();
-		mensaje = string.Empty;
 	}
 
 	public void Volver()
