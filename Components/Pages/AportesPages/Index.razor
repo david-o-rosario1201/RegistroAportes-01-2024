@@ -3,6 +3,7 @@
 @rendermode InteractiveServer
 @attribute [StreamRendering]
 @inject NavigationManager navigation
+@inject ToastService toastService
 
 <PageTitle>Aportes</PageTitle>
 <div class="container">
@@ -103,7 +104,8 @@
 		</div>
 	</div>
 </div>
-@mensaje
+
+<Toast @ref="toastService.ToastComponent" Duration="4000" IconClass="bi bi-info-circle" Persist="true"/>
 
 @code {
 	public List<Aportes> aportes = new List<Aportes>();
@@ -112,7 +114,6 @@
 	public DateTime hasta { get; set; } = DateTime.Today;
 	public string filtro { get; set; }
 	public string valorFiltro { get; set; }
-	public string mensaje { get; set; }
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -127,20 +128,21 @@
 		StateHasChanged();
 	}
 
+	public void ShowToastError(string mensaje) => toastService.ShowDangerToast("Busqueda de Aportes",mensaje);
+	public void ShowToastSuccess(string mensaje) => toastService.ShowSuccessToast("Busqueda de Aportes",mensaje);
+
 	public async Task Buscar()
 	{
 		if (desde > hasta)
 		{
-			mensaje = "La fecha inicial no puede ser mayor a la fecha final";
+			ShowToastError("La fecha inicial no puede ser mayor a la fecha final");
 			await Task.Delay(3000);
-			mensaje = string.Empty;
 			return;
 		}
 		if (valorFiltro == null)
 		{
-			mensaje = "Debe ingresar un dato";
+			ShowToastError("Debe ingresar un dato");
 			await Task.Delay(3000);
-			mensaje = string.Empty;
 			return;
 		}
 		List<Aportes> filtradoList1 = new List<Aportes>();
@@ -153,9 +155,8 @@
 			}
 			else
 			{
-				mensaje = "El valor ingresado para AporteId no es válido";
+				ShowToastError("El valor ingresado para AporteId no es válido");
 				await Task.Delay(3000);
-				mensaje = string.Empty;
 			}
 		}
 		else if (filtro == "persona")
@@ -165,9 +166,8 @@
 		}
 		else
 		{
-			mensaje = "Debe elegir un método parar filtrar";
+			ShowToastError("Debe elegir un método parar filtrar");
 			await Task.Delay(3000);
-			mensaje = string.Empty;
 		}
 	}
 
@@ -175,6 +175,7 @@
 	{
 		aportes = await aportesService.Listar(a => a.AporteId > 0);
 		montoTotal = aportes.Sum(a => a.Monto);
+		ShowToastSuccess("Lo datos fueron resstablecidos");
 	}
 
 	public async Task Filtrado(List<Aportes> filtrados)
@@ -187,12 +188,14 @@
 		}
 
 		if (filtradoList2.Count != 0)
+		{
 			aportes = filtradoList2;
+			ShowToastSuccess("Se encontraron resultados");
+		}
 		else
 		{
-			mensaje = "No se encontraron resultados";
+			ShowToastError("No se encontraron resultados");
 			await Task.Delay(3000);
-			mensaje = string.Empty;
 		}
 	}
 
