@@ -68,38 +68,63 @@
 	</div>
 </EditForm>
 
-<Toast @ref="toastService.ToastComponent" Duration="4000" IconClass="bi bi-info-circle" Persist="true"/>
+<Toast @ref="toastService.ToastComponent" Duration="4000" IconClass="bi bi-info-circle" Persist="true" />
 
 @code {
 	[Parameter]
 	public int aporteId { get; set; }
 	public Aportes aporte { get; set; } = new Aportes();
+	public string observacionActual { get; set; }
 
 	protected override async Task OnInitializedAsync()
 	{
 		await Task.Delay(500);
 		if (aporteId > 0)
+		{
 			aporte = await aportesService.Buscar(aporteId);
+			observacionActual = aporte.Observacion;
+		}
 	}
 
 	public async Task Modificar()
 	{
-		var modificar = await aportesService.Crear(aporte);
-		if (modificar)
+		if (!await Validar())
 		{
-			ShowToastSuccess();
-			await Task.Delay(2000);
-			Volver();
+			var modificar = await aportesService.Crear(aporte);
+			if (modificar)
+			{
+				ShowToastSuccess();
+				await Task.Delay(2000);
+				Volver();
+			}
+			else
+				ShowToastFail();
 		}
 		else
-			ShowToastFail();
+			ShowToastRepeated();
 	}
 
 	public void ShowToastSuccess() => toastService.ShowSuccessToast("Editar Aporte", "El aporte se modificó con éxito");
 	public void ShowToastFail() => toastService.ShowDangerToast("Editar Aporte", "No pueden haber campos vacíos");
+	public void ShowToastRepeated() => toastService.ShowErrorToast("Editar aporte", "Ya existe un aporte con esta observación");
+
 
 	public void Volver()
 	{
-		navigation.NavigateTo("/DetailsAportes");
+		navigation.NavigateTo("/Aportes");
+	}
+
+	public async Task<bool> Validar()
+	{
+		var observacion = await aportesService.BuscarObservacion(aporte.Observacion);
+
+		if (observacion is not null)
+		{
+			if (observacion.Observacion == observacionActual)
+				return false;
+			else
+				return true;
+		}
+		return false;
 	}
 }
