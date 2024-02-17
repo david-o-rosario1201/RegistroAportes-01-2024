@@ -1,229 +1,61 @@
 ﻿@page "/DetailsAportes"
+@page "/DetailsAportes/aporteid={aporteId:int}"
+
 @inject AportesService aportesService
 @rendermode InteractiveServer
 @attribute [StreamRendering]
 @inject NavigationManager navigation
-@inject ToastService toastService
 
-<PageTitle>Detalles de Aportes</PageTitle>
+<PageTitle>Detalle Aporte</PageTitle>
 <div class="container">
 	<div class="card shadow-lg">
 		@*Header*@
 		<div class="card-header">
-			<h3><strong>Detalles Aportes</strong></h3>
-			<button type="button" class="btn btn-outline-primary" @onclick="Volver"><i class="bi bi-box-arrow-left" /> Volver</button>
+			<h3><strong>Detalle Aporte</strong></h3>
 		</div>
 		@*Body*@
-		<div class="card-body">
-			@if (loading)
-			{
-				<div class="d-flex justify-content-center">
-					<div class="spinner-border text-info" role="status">
-						<span class="visually-hidden">Cargando...</span>
-					</div>
-				</div>
-			}
-			else if (aportes.Count == 0)
-			{
-				<h1 class="miMensaje"><i class="bi bi-exclamation-triangle" /> No hay aportes creados</h1>
-			}
-			else
-			{
-				@*Fechas*@
-				<div class="mb-3">
-					<div class="row">
-						<div class="col-3">
-							<label class="form-label" for="desde"><strong>Desde:</strong></label>
-							<InputDate id="desde" class="form-control" @bind-Value="desde"></InputDate>
-						</div>
-						<div class="col-3">
-							<label class="form-label" for="hasta"><strong>Hasta:</strong></label>
-							<InputDate id="hasta" class="form-control" @bind-Value="hasta"></InputDate>
-						</div>
-					</div>
-				</div>
-
-				@*Campos a Filtrar*@
-				<div class="mb-3">
-					<div class="row align-items-center">
-						<label class="form-label" for="filtro"><strong>Campo a Filtrar:</strong></label>
-						<div class="col-3">
-							<InputSelect id="filtro" class="form-select" @bind-Value="filtro">
-								<option>Elije una opci&oacute;n</option>
-								<option value="aporte id">Aporte Id</option>
-								<option value="persona">Persona</option>
-							</InputSelect>
-						</div>
-						<div class="col-auto miFlecha">
-							<p>→</p>
-						</div>
-						<div class="col-4">
-							<div class="input-group">
-								<InputText class="form-control" @bind-Value="valorFiltro" placeholder="Ingrese un dato para filtrar"></InputText>
-								<button type="button" class="btn btn-outline-primary" @onclick="Buscar"><i class="bi bi-search" /></button>
-							</div>
-						</div>
-						<div class="col-3">
-							<button type="button" class="btn btn-outline-secondary" @onclick="Restablecer"><i class="bi bi-arrow-clockwise" /> Restablecer</button>
-						</div>
-					</div>
-				</div>
-
-				<table class="table">
-					<thead>
-						<tr>
-							<th>Aporte Id</th>
-							<th>Fecha</th>
-							<th>Persona</th>
-							<th>Observaci&oacute;n</th>
-							<th>Monto</th>
-							<th>Ver</th>
-							<th>Editar</th>
-							<th>Eliminar</th>
-						</tr>
-					</thead>
-					<tbody>
-						@foreach (var aporte in aportes)
-						{
-							<tr>
-								<td>@aporte.AporteId</td>
-								<td>@aporte.Fecha.ToShortDateString()</td>
-								<td>@aporte.Persona</td>
-								<td>@aporte.Observacion</td>
-								<td>@aporte.Monto</td>
-								<td><button type="button" class="btn btn-outline-info" @onclick="(e) => IrAEditar(aporte.AporteId)"><i class="bi bi-eye" /> </button></td>
-								<td><button type="button" class="btn btn-outline-warning" @onclick="(e) => IrAEditar(aporte.AporteId)"><i class="bi bi-pencil-square" /> </button></td>
-								<td><button type="button" class="btn btn-outline-danger" @onclick="(e) => IrAEliminar(aporte.AporteId)"><i class="bi bi-trash3-fill" /> </button></td>
-							</tr>
-						}
-					</tbody>
-				</table>
-			}
+		<div class="card-body col-5">
+			<h3><strong>Informaci&oacute;n del aporte #@aporteId</strong></h3>
+			@*Datos*@
+			<div class="mb-1">
+				<p class="mb-2"><strong>Aporte Id:</strong> @aporte.AporteId</p>
+			</div>
+			<div class="mb-1">
+				<p class="mb-2"><strong>Fecha:</strong> @aporte.Fecha.ToShortDateString()</p>
+			</div>
+			<div class="mb-1">
+				<p class="mb-2"><strong>Persona:</strong> @aporte.Persona</p>
+			</div>
+			<div class="mb-1">
+				<p class="mb-2"><strong>Observaci&oacute;n:</strong> @aporte.Observacion</p>
+			</div>
+			<div class="mb-1">
+				<p class="mb-2"><strong>Monto:</strong> @aporte.Monto.ToString("N2")</p>
+			</div>
 		</div>
 		@*Footer*@
-		<div class="card-footer">
-			<div class="row">
-				<div class="col-10">
-					<p><strong>Total de Aportes:</strong> @aportes.Count</p>
-				</div>
-				<div class="col">
-					<p><strong>Monto Total:</strong> @montoTotal</p>
-				</div>
+		<div class="card-footer d-flex justify-content-center">
+			<div class="px-2">
+				<button type="button" class="btn btn-outline-dark" @onclick="Volver"><i class="bi bi-box-arrow-left" /> Volver</button>
 			</div>
 		</div>
 	</div>
 </div>
 
-<Toast @ref="toastService.ToastComponent" Duration="4000" IconClass="bi bi-info-circle" Persist="true" />
-
 @code {
-	public List<Aportes> aportes = new List<Aportes>();
-	public decimal montoTotal { get; set; }
-	public DateTime desde { get; set; } = DateTime.Today;
-	public DateTime hasta { get; set; } = DateTime.Today;
-	public string filtro { get; set; }
-	public string valorFiltro { get; set; }
-	public bool loading { get; set; } = true;
+	[Parameter]
+	public int aporteId { get; set; }
+	public Aportes aporte { get; set; } = new Aportes();
 
 	protected override async Task OnInitializedAsync()
 	{
 		await Task.Delay(500);
-		aportes = await aportesService.Listar(a => a.AporteId > 0);
-		montoTotal = aportes.Sum(a => a.Monto);
-
-		loading = false;
-
-		if (aportes.Count == 0)
-			StateHasChanged();
-	}
-
-	protected override async Task OnAfterRenderAsync(bool firstRender)
-	{
-		montoTotal = aportes.Sum(a => a.Monto);
-		StateHasChanged();
-	}
-
-	public void ShowToastError(string mensaje) => toastService.ShowDangerToast("Busqueda de Aportes", mensaje);
-	public void ShowToastSuccess(string mensaje) => toastService.ShowSuccessToast("Busqueda de Aportes", mensaje);
-
-	public async Task Buscar()
-	{
-		if (desde > hasta)
-		{
-			ShowToastError("La fecha inicial no puede ser mayor a la fecha final");
-			await Task.Delay(3000);
-			return;
-		}
-		if (valorFiltro == null)
-		{
-			ShowToastError("Debe ingresar un dato");
-			await Task.Delay(3000);
-			return;
-		}
-		List<Aportes> filtradoList1 = new List<Aportes>();
-		if (filtro == "aporte id")
-		{
-			if (int.TryParse(valorFiltro, out int id))
-			{
-				filtradoList1 = await aportesService.Listar(a => a.AporteId == id);
-				Filtrado(filtradoList1);
-			}
-			else
-			{
-				ShowToastError("El valor ingresado para AporteId no es válido");
-				await Task.Delay(3000);
-			}
-		}
-		else if (filtro == "persona")
-		{
-			filtradoList1 = await aportesService.Listar(a => a.Persona == valorFiltro);
-			Filtrado(filtradoList1);
-		}
-		else
-		{
-			ShowToastError("Debe elegir un método parar filtrar");
-			await Task.Delay(3000);
-		}
-	}
-
-	public async Task Restablecer()
-	{
-		aportes = await aportesService.Listar(a => a.AporteId > 0);
-		montoTotal = aportes.Sum(a => a.Monto);
-		ShowToastSuccess("Lo datos fueron resstablecidos");
-	}
-
-	public async Task Filtrado(List<Aportes> filtrados)
-	{
-		List<Aportes> filtradoList2 = new List<Aportes>();
-		foreach (var filtrado in filtrados)
-		{
-			if (filtrado.Fecha >= desde && filtrado.Fecha <= hasta)
-				filtradoList2.Add(filtrado);
-		}
-
-		if (filtradoList2.Count != 0)
-		{
-			aportes = filtradoList2;
-			ShowToastSuccess("Se encontraron resultados");
-		}
-		else
-		{
-			ShowToastError("No se encontraron resultados");
-			await Task.Delay(3000);
-		}
+		if (aporteId > 0)
+			aporte = await aportesService.Buscar(aporteId);
 	}
 
 	public void Volver()
 	{
 		navigation.NavigateTo("/Aportes");
-	}
-	public void IrAEditar(int id)
-	{
-		navigation.NavigateTo($"/EditAportes/aporteid={id}");
-	}
-	public void IrAEliminar(int id)
-	{
-		navigation.NavigateTo($"/DeleteAportes/aporteid={id}");
 	}
 }
