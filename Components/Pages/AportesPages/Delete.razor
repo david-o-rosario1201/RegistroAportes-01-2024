@@ -15,13 +15,13 @@
 		</div>
 		@*Body*@
 		<div class="card-body col-5">
-			<h3><strong>¿Éstas seguro de que quieres eliminar este aporte?</strong></h3>
+			<h3><strong>¿Est&aacute;s seguro de que quieres eliminar este aporte?</strong></h3>
 			@*Datos*@
 			<div class="mb-1">
 				<p class="mb-0">Aporte Id: @aporte.AporteId</p>
 			</div>
 			<div class="mb-1">
-				<p class="mb-0">Fecha: @aporte.Fecha</p>
+				<p class="mb-0">Fecha: @aporte.Fecha.ToShortDateString()</p>
 			</div>
 			<div class="mb-1">
 				<p class="mb-0">Persona: @aporte.Persona</p>
@@ -30,7 +30,7 @@
 				<p class="mb-0">Observaci&oacute;n: @aporte.Observacion</p>
 			</div>
 			<div class="mb-1">
-				<p class="mb-0">Monto: @aporte.Monto</p>
+				<p class="mb-0">Monto: @aporte.Monto.ToString("N2")</p>
 			</div>
 		</div>
 		@*Footer*@
@@ -76,6 +76,6 @@
 
 	public void Volver()
 	{
-		navigation.NavigateTo("/DetailsAportes");
+		navigation.NavigateTo("/Aportes");
 	}
 }
