@@ -11,8 +11,7 @@
 		@*Header*@
 		<div class="card-header">
 			<h3><strong>Aportes</strong></h3>
-			<button type="button" class="btn btn-outline-primary" @onclick="IrACrear"><i class="bi bi-plus-circle" /> Crear</button>
-			<button type="button" class="btn btn-outline-info" @onclick="IrADetalles"><i class="bi bi-card-list" /> Detalles</button>
+			<button type="button" class="btn btn-outline-primary" @onclick="Crear"><i class="bi bi-plus-circle" /> Crear</button>
 		</div>
 		@*Body*@
 		<div class="card-body">
@@ -70,7 +69,7 @@
 					</div>
 				</div>
 
-				<table class="table">
+				<table class="table table-bordered miTabla">
 					<thead>
 						<tr>
 							<th>Aporte Id</th>
@@ -78,6 +77,9 @@
 							<th>Persona</th>
 							<th>Observaci&oacute;n</th>
 							<th>Monto</th>
+							<th>Detalle</th>
+							<th>Editar</th>
+							<th>Eliminar</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -88,7 +90,10 @@
 								<td>@aporte.Fecha.ToShortDateString()</td>
 								<td>@aporte.Persona</td>
 								<td>@aporte.Observacion</td>
-								<td>@aporte.Monto</td>
+								<td>@aporte.Monto.ToString("N2")</td>
+								<td><button type="button" class="btn btn-outline-info" @onclick="(e) => IrADetalle(aporte.AporteId)"><i class="bi bi-eye" /> </button></td>
+								<td><button type="button" class="btn btn-outline-warning" @onclick="(e) => IrAEditar(aporte.AporteId)"><i class="bi bi-pencil-square" /> </button></td>
+								<td><button type="button" class="btn btn-outline-danger" @onclick="(e) => IrAEliminar(aporte.AporteId)"><i class="bi bi-trash3-fill" /> </button></td>
 							</tr>
 						}
 					</tbody>
@@ -98,18 +103,18 @@
 		@*Footer*@
 		<div class="card-footer">
 			<div class="row">
-				<div class="col-10">
+				<div class="col text-start">
 					<p><strong>Total de Aportes:</strong> @aportes.Count</p>
 				</div>
-				<div class="col">
-					<p><strong>Monto Total:</strong> @montoTotal</p>
+				<div class="col text-end">
+					<p><strong>Monto Total:</strong> @montoTotal.ToString("N2")</p>
 				</div>
 			</div>
 		</div>
 	</div>
 </div>
 
-<Toast @ref="toastService.ToastComponent" Duration="4000" IconClass="bi bi-info-circle" Persist="true"/>
+<Toast @ref="toastService.ToastComponent" Duration="4000" IconClass="bi bi-info-circle" Persist="true" />
 
 @code {
 	public List<Aportes> aportes = new List<Aportes>();
@@ -127,6 +132,7 @@
 		montoTotal = aportes.Sum(a => a.Monto);
 
 		loading = false;
+
 		if (aportes.Count == 0)
 			StateHasChanged();
 	}
@@ -137,8 +143,8 @@
 		StateHasChanged();
 	}
 
-	public void ShowToastError(string mensaje) => toastService.ShowDangerToast("Busqueda de Aportes",mensaje);
-	public void ShowToastSuccess(string mensaje) => toastService.ShowSuccessToast("Busqueda de Aportes",mensaje);
+	public void ShowToastError(string mensaje) => toastService.ShowDangerToast("Busqueda de Aportes", mensaje);
+	public void ShowToastSuccess(string mensaje) => toastService.ShowSuccessToast("Busqueda de Aportes", mensaje);
 
 	public async Task Buscar()
 	{
@@ -208,12 +214,20 @@
 		}
 	}
 
-	public void IrACrear()
+	public void Crear()
 	{
 		navigation.NavigateTo("/CreateAportes");
 	}
-	public void IrADetalles()
+	public void IrAEditar(int id)
 	{
-		navigation.NavigateTo("/DetailsAportes");
+		navigation.NavigateTo($"/EditAportes/aporteid={id}");
+	}
+	public void IrAEliminar(int id)
+	{
+		navigation.NavigateTo($"/DeleteAportes/aporteid={id}");
+	}
+	public void IrADetalle(int id)
+	{
+		navigation.NavigateTo($"/DetailsAportes/aporteid={id}");
 	}
 }
