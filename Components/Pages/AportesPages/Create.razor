@@ -96,21 +96,36 @@
 
 	public async Task Crear()
 	{
-		var crear = await aportesService.Crear(aporte);
-		if (crear)
+		if (!await Validar())
 		{
-			//mensaje = "El aporte se creó con éxito";
-			ShowToastSuccess();
-			await Task.Delay(2000);
-			LimpiarPantalla();
+			var crear = await aportesService.Crear(aporte);
+			if (crear)
+			{
+				//mensaje = "El aporte se creó con éxito";
+				ShowToastSuccess();
+				await Task.Delay(2000);
+				LimpiarPantalla();
+			}
+			else
+				ShowToastFail();
 		}
 		else
-			ShowToastFail();
+			ShowToastRepeated();
 	}
 
 	public void ShowToastSuccess() => toastService.ShowSuccessToast("Crear aporte", "El aporte se creó con éxito");
 	public void ShowToastFail() => toastService.ShowDangerToast("Crear aporte", "No pueden haber campos vacíos");
+	public void ShowToastRepeated() => toastService.ShowErrorToast("Crear aporte", "Ya existe un aporte con esta observación.");
 
+
+	public async Task<bool> Validar()
+	{
+		var observacion = await aportesService.BuscarObservacion(aporte.Observacion);
+
+		if (observacion is not null)
+			return true;
+		return false;
+	}
 
 	public void LimpiarPantalla()
 	{
