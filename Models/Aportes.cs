@@ -18,8 +18,6 @@ public class Aportes
 	[Required(ErrorMessage = "Debe ingresar una observación")]
 	public string Observacion { get; set; }
 
-	[Range(1, float.MaxValue, ErrorMessage = "El monto debe ser mayor o igual a 0")]
+	[Range(1, 100000000, ErrorMessage = "El monto debe ser mayor que 0 y menor que {2}")]
 	public decimal Monto { get; set; }
-
-
 }
