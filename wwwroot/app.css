@@ -49,3 +49,11 @@ h1:focus {
 .darker-border-checkbox.form-check-input {
     border-color: #929292;
 }
+
+.valid.modified:not([type=checkbox]) {
+    border-left: 5px solid #42A948; /* Verde */
+}
+
+.invalid {
+    border-right: 5px solid #a94442; /* Rojo */
+}
